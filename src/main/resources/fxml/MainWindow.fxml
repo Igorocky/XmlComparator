@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -21,19 +22,48 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Left file" />
-                  <Label text="Right file" GridPane.rowIndex="1" />
-                  <TextField fx:id="leftFileFld" GridPane.columnIndex="1" />
-                  <TextField fx:id="rightFileFld" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="mainframe" />
+                  <Label text="java" GridPane.rowIndex="1" />
+                  <TextField fx:id="mainframeFld" text="D:\programs\scala\XmlComparator\src\test\resources\mainframeFile.txt" GridPane.columnIndex="1" />
+                  <TextField fx:id="javaFld" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Jar" GridPane.rowIndex="2" />
                   <TextField fx:id="jarFld" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Button fx:id="leftFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" />
                   <Button fx:id="rightFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
                   <Button fx:id="jarBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Label text="Result" GridPane.rowIndex="3" />
+                  <TextField fx:id="resultFld" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Button fx:id="resultBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="3" />
                </children>
             </GridPane>
+            <FlowPane hgap="5.0" prefHeight="40.0" prefWidth="724.0">
+               <children>
+                  <Button fx:id="loadBtn" mnemonicParsing="false" text="Load" />
+                  <Button fx:id="saveBtn" mnemonicParsing="false" text="Save" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </FlowPane>
+            <SplitPane dividerPositions="0.5" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <items>
+                  <ScrollPane fx:id="scrollPane" prefHeight="198.0" prefWidth="421.0">
+                     <content>
+                        <HBox fx:id="hboxInScrollPane" maxWidth="1.7976931348623157E308" prefHeight="396.0" prefWidth="348.0">
+                           <children>
+                              <VBox fx:id="mainframeElemsVbox" prefHeight="396.0" prefWidth="148.0" />
+                              <VBox fx:id="arrowsVbox" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
+                              <VBox fx:id="rightFileVbox" prefHeight="200.0" prefWidth="100.0" />
+                           </children>
+                        </HBox>
+                     </content>
+                  </ScrollPane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+               </items>
+            </SplitPane>
          </children>
       </VBox>
    </children>
