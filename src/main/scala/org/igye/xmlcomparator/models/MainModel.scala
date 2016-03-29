@@ -3,6 +3,7 @@ package org.igye.xmlcomparator.models
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javafx.beans.property.{ObjectProperty, SimpleObjectProperty}
 import javafx.collections.FXCollections
 
 import scala.io.Source
@@ -11,6 +12,8 @@ class MainModel {
   val mainframeRows = FXCollections.observableArrayList[FileRow]()
   val javaRows = FXCollections.observableArrayList[FileRow]()
   val connections = FXCollections.observableArrayList[Connection]()
+
+  val selectedMainframeRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
 
   def load(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
     val mainframePattern = """^(\d+)\s+(\S+)\s+(<.+)$""".r
