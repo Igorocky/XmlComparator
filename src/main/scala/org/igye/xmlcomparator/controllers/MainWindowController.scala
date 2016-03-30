@@ -15,7 +15,7 @@ import org.igye.jfxutils.annotations.FxmlFile
 import org.igye.jfxutils.fxml.Initable
 import org.igye.jfxutils.properties.{ChgListener, Expr}
 import org.igye.jfxutils.{JfxUtils, Window}
-import org.igye.xmlcomparator.models.{Connection, FileRow, MainModel}
+import org.igye.xmlcomparator.models.{Transformation, Connection, FileRow, MainModel}
 
 import scala.collection.JavaConversions._
 
@@ -31,6 +31,8 @@ class MainWindowController extends Window with Initable {
   protected var mainframeFld: TextField = _
   @FXML
   protected var javaFld: TextField = _
+  @FXML
+  protected var jarFld: TextField = _
   @FXML
   protected var scrollPane: ScrollPane = _
   @FXML
@@ -63,12 +65,14 @@ class MainWindowController extends Window with Initable {
   protected var initialJavaLabel: Label = _
   @FXML
   protected var resultJavaLabel: Label = _
+  @FXML
+  protected var possibleMfTransforms: ChoiceBox[String] = _
 
   private val loadAction = new Action {
     override val description: String = "Load"
     setShortcut(Shortcut(CONTROL, L))
     override protected def onAction(): Unit = {
-      model.load(mainframeFld.getText, javaFld.getText, null, null)
+      model.load(mainframeFld.getText, javaFld.getText, jarFld.getText, null)
     }
   }
 
@@ -104,6 +108,7 @@ class MainWindowController extends Window with Initable {
     require(rootNode != null)
     require(mainframeFld != null)
     require(javaFld != null)
+    require(jarFld != null)
     require(scrollPane != null)
     require(hboxInScrollPane != null)
     require(mainframeElemsVbox != null)
@@ -120,6 +125,7 @@ class MainWindowController extends Window with Initable {
     require(javaTimestampLabel != null)
     require(initialJavaLabel != null)
     require(resultJavaLabel != null)
+    require(possibleMfTransforms != null)
 
     initWindow(rootNode)
     bindModel()
@@ -170,6 +176,8 @@ class MainWindowController extends Window with Initable {
       model.selectedJavaRow.get() != null
     }
     resultJavaLabel.visibleProperty() <== detailedJavaView.visibleProperty()
+
+    possibleMfTransforms.getItems <== (model.possibleTransformations, (t: Transformation) => t.name)
   }
 
   private def createLineFromConnection(connection: Connection) = {

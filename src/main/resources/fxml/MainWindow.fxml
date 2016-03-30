@@ -30,7 +30,7 @@
                   <TextField fx:id="mainframeFld" text="D:\programs\scala\XmlComparator\src\test\resources\mainframeFile.txt" GridPane.columnIndex="1" />
                   <TextField fx:id="javaFld" text="D:\programs\scala\XmlComparator\src\test\resources\javaFile.txt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Jar" GridPane.rowIndex="2" />
-                  <TextField fx:id="jarFld" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="jarFld" text="D:\programs\java\comparex\target\comparex-1.0-SNAPSHOT.jar" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Button fx:id="leftFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" />
                   <Button fx:id="rightFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
                   <Button fx:id="jarBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
