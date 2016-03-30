@@ -8,6 +8,8 @@ import javafx.collections.FXCollections
 
 import scala.io.Source
 
+import scala.collection.JavaConversions._
+
 class MainModel {
   val mainframeRows = FXCollections.observableArrayList[FileRow]()
   val javaRows = FXCollections.observableArrayList[FileRow]()
@@ -15,6 +17,22 @@ class MainModel {
 
   val selectedMainframeRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
   val selectedJavaRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
+
+  def connect(mainframeRow: FileRow, javaRow: FileRow): Unit = {
+    connections.add(Connection(mainframeRow, javaRow))
+  }
+
+  def disconnect(mainframeRow: FileRow, javaRow: FileRow): Unit = {
+    connections.remove(Connection(mainframeRow, javaRow))
+  }
+
+  def isNotConnected(fileRow: FileRow) = {
+    connections.toList.find(c => c.mainframeRow == fileRow || c.javaRow == fileRow).isEmpty
+  }
+
+  def areConnected(mainframeRow: FileRow, javaRow: FileRow) = {
+    connections.toList.find(c => c.mainframeRow == mainframeRow && c.javaRow == javaRow).isDefined
+  }
 
   def load(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
     mainframeRows.clear()
