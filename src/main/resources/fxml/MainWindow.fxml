@@ -28,7 +28,7 @@
                   <Label text="mainframe" />
                   <Label text="java" GridPane.rowIndex="1" />
                   <TextField fx:id="mainframeFld" text="D:\programs\scala\XmlComparator\src\test\resources\mainframeFile.txt" GridPane.columnIndex="1" />
-                  <TextField fx:id="javaFld" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="javaFld" text="D:\programs\scala\XmlComparator\src\test\resources\javaFile.txt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Jar" GridPane.rowIndex="2" />
                   <TextField fx:id="jarFld" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <Button fx:id="leftFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" />
@@ -56,12 +56,29 @@
                            <children>
                               <VBox fx:id="mainframeElemsVbox" prefWidth="148.0" />
                               <VBox fx:id="arrowsVbox" prefWidth="100.0" HBox.hgrow="ALWAYS" />
-                              <VBox fx:id="rightFileVbox" prefWidth="100.0" />
+                              <VBox fx:id="javaElemsVbox" prefWidth="100.0" />
                            </children>
                         </HBox>
                      </content>
                   </ScrollPane>
-                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Pane fx:id="rightPane" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <SplitPane fx:id="secondSplitPane" dividerPositions="0.5" layoutX="24.0" layoutY="26.0" orientation="VERTICAL" prefHeight="301.0" prefWidth="270.0">
+                          <items>
+                              <ScrollPane prefViewportHeight="153.0" prefViewportWidth="260.0">
+                                 <content>
+                                    <VBox fx:id="mainframeDetailedViewVbox" />
+                                 </content>
+                              </ScrollPane>
+                              <ScrollPane prefViewportHeight="152.0" prefViewportWidth="260.0">
+                                 <content>
+                                    <VBox fx:id="javaDetailedViewVbox" />
+                                 </content>
+                              </ScrollPane>
+                          </items>
+                        </SplitPane>
+                     </children>
+                  </Pane>
                </items>
             </SplitPane>
          </children>

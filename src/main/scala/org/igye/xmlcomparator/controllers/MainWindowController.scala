@@ -1,10 +1,10 @@
 package org.igye.xmlcomparator.controllers
 
 import javafx.fxml.FXML
-import javafx.scene.control.{Button, Label, TextField, ScrollPane}
+import javafx.scene.control._
 import javafx.scene.input.KeyCode._
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.{VBox, HBox, StackPane}
+import javafx.scene.layout.{Pane, VBox, HBox, StackPane}
 import javafx.scene.paint.Color
 
 import org.apache.logging.log4j.{LogManager, Logger}
@@ -29,19 +29,31 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var mainframeFld: TextField = _
   @FXML
+  protected var javaFld: TextField = _
+  @FXML
   protected var scrollPane: ScrollPane = _
   @FXML
   protected var hboxInScrollPane: HBox = _
   @FXML
   protected var mainframeElemsVbox: VBox = _
   @FXML
+  protected var javaElemsVbox: VBox = _
+  @FXML
   protected var loadBtn: Button = _
+  @FXML
+  protected var rightPane: Pane = _
+  @FXML
+  protected var secondSplitPane: SplitPane = _
+  @FXML
+  protected var mainframeDetailedViewVbox: VBox = _
+  @FXML
+  protected var javaDetailedViewVbox: VBox = _
 
   private val loadAction = new Action {
     override val description: String = "Load"
     setShortcut(Shortcut(CONTROL, L))
     override protected def onAction(): Unit = {
-      model.load(mainframeFld.getText, null, null, null)
+      model.load(mainframeFld.getText, javaFld.getText, null, null)
     }
   }
 
@@ -52,9 +64,15 @@ class MainWindowController extends Window with Initable {
   override def init(): Unit = {
     require(rootNode != null)
     require(mainframeFld != null)
+    require(javaFld != null)
     require(scrollPane != null)
     require(hboxInScrollPane != null)
     require(mainframeElemsVbox != null)
+    require(javaElemsVbox != null)
+    require(rightPane != null)
+    require(secondSplitPane != null)
+    require(mainframeDetailedViewVbox != null)
+    require(javaDetailedViewVbox != null)
 
     initWindow(rootNode)
     bindModel()
@@ -66,25 +84,44 @@ class MainWindowController extends Window with Initable {
   private def bindModel(): Unit = {
     hboxInScrollPane.setBorder(JfxUtils.createBorder(Color.BLUE))
     hboxInScrollPane.prefWidthProperty() <== scrollPane.widthProperty()
+    mainframeElemsVbox.setBorder(JfxUtils.createBorder(Color.RED))
+    javaElemsVbox.setBorder(JfxUtils.createBorder(Color.RED))
 
-    mainframeElemsVbox.getChildren <== (model.mainframeRows, createNodeFromFileRow)
+    rightPane.setBorder(JfxUtils.createBorder(Color.YELLOW))
 
-    model.selectedMainframeRow ==> ChgListener {chg=>
-      mainframeElemsVbox.getChildren.toList.map(_.asInstanceOf[HasAssignedRow with Selectable])
-      .foreach{label =>
-        val selected = model.selectedMainframeRow.getValue
-        if (selected == label.getRow) {
-          label.select1
-        } else if (selected.accId == label.getRow.accId) {
-          label.select2
-        } else {
-          label.unselect
+    secondSplitPane.setLayoutX(0)
+    secondSplitPane.setLayoutY(0)
+    secondSplitPane.prefWidthProperty() <== rightPane.widthProperty()
+    secondSplitPane.prefHeightProperty() <== rightPane.heightProperty()
+
+    mainframeElemsVbox.getChildren <== (model.mainframeRows, createNodeFromFileRow(_: FileRow, model.selectedMainframeRow.setValue(_)))
+    javaElemsVbox.getChildren <== (model.javaRows, createNodeFromFileRow(_: FileRow, model.selectedJavaRow.setValue(_)))
+
+    model.selectedMainframeRow ==> createSelectionListener(mainframeElemsVbox, mainframeDetailedViewVbox)
+    model.selectedJavaRow ==> createSelectionListener(javaElemsVbox, javaDetailedViewVbox)
+  }
+
+  private def createSelectionListener(elemsVbox: VBox, detailedViewVbox: VBox) = {
+    ChgListener[FileRow] {chg=>
+      val selected = chg.newValue
+      elemsVbox.getChildren.toList.map(_.asInstanceOf[HasAssignedRow with Selectable])
+        .foreach{label =>
+          if (selected == label.getRow) {
+            label.select1
+          } else if (selected.accId == label.getRow.accId) {
+            label.select2
+          } else {
+            label.unselect
+          }
         }
+      detailedViewVbox.getChildren.clear()
+      if (selected != null) {
+        detailedViewVbox.getChildren.add(new Label(selected.xmlStr))
       }
     }
   }
 
-  private def createNodeFromFileRow(fileRow: FileRow) = {
+  private def createNodeFromFileRow(fileRow: FileRow, mouseClickedHnd: FileRow => Unit) = {
     val res = new Label(fileRow.id) with HasAssignedRow with Selectable {
       private val initialBackground = getBackground
 
@@ -95,8 +132,8 @@ class MainWindowController extends Window with Initable {
 
       override def unselect: Unit = setBackground(initialBackground)
     }
-    res.hnd(MouseEvent.MOUSE_CLICKED){event=>
-      model.selectedMainframeRow.setValue(fileRow)
+    res.hnd(MouseEvent.MOUSE_CLICKED){ event =>
+      mouseClickedHnd(fileRow)
     }
     res
   }
