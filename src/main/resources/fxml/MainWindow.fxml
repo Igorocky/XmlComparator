@@ -80,18 +80,7 @@
                                        <children>
                                           <Label fx:id="mfTimestampLabel" text="mfTimestampLabel" />
                                           <Label fx:id="initialMfLabel" text="initialMfLabel" />
-                                          <HBox prefWidth="262.0">
-                                             <children>
-                                                <ChoiceBox fx:id="possibleMfTransforms" prefWidth="150.0" />
-                                                <Button fx:id="addMfTransformBtn" mnemonicParsing="false" text="+" />
-                                             </children>
-                                          </HBox>
-                                          <HBox prefHeight="78.0" prefWidth="262.0">
-                                             <children>
-                                                <ListView fx:id="selectedMfTransforms" prefHeight="200.0" prefWidth="200.0" />
-                                                <Button fx:id="removeMfTransformBtn" mnemonicParsing="false" text="-" />
-                                             </children>
-                                          </HBox>
+                                          <HBox fx:id="mfSelector" prefHeight="78.0" prefWidth="262.0" />
                                        </children>
                                     </VBox>
                                  </content>

@@ -41,10 +41,13 @@ class MainModel {
 
   def load(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
     mainframeRows.clear()
-    loadFromFile(new File(mainframeFile)).foreach{mainframeRows.add}
-    loadFromFile(new File(javaFile)).foreach{javaRows.add}
+    javaRows.clear()
+
     possibleTransformations.clear()
     readModifiers(jarFile).foreach(possibleTransformations.add(_))
+
+    loadFromFile(new File(mainframeFile)).foreach{mainframeRows.add}
+    loadFromFile(new File(javaFile)).foreach{javaRows.add}
   }
 
   private def loadFromFile(file: File) = {

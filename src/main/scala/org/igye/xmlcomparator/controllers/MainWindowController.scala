@@ -12,7 +12,7 @@ import org.apache.logging.log4j.{LogManager, Logger}
 import org.igye.jfxutils.Implicits.{listToListOperators, nodeToNodeOps, observableValueToObservableValueOperators, propertyToPropertyOperators}
 import org.igye.jfxutils.action.{Action, Shortcut}
 import org.igye.jfxutils.annotations.FxmlFile
-import org.igye.jfxutils.fxml.Initable
+import org.igye.jfxutils.fxml.{FxmlSupport, Initable}
 import org.igye.jfxutils.properties.{ChgListener, Expr}
 import org.igye.jfxutils.{JfxUtils, Window}
 import org.igye.xmlcomparator.models.{Transformation, Connection, FileRow, MainModel}
@@ -66,13 +66,9 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var resultJavaLabel: Label = _
   @FXML
-  protected var possibleMfTransforms: ChoiceBox[String] = _
-  @FXML
-  protected var addMfTransformBtn: Button = _
-  @FXML
-  protected var removeMfTransformBtn: Button = _
-  @FXML
-  protected var selectedMfTransforms: ListView[String] = _
+  protected var mfSelector: HBox = _
+
+  protected val mfSelectorController = FxmlSupport.load[SelectorController]
 
   private val loadAction = new Action {
     override val description: String = "Load"
@@ -93,26 +89,6 @@ class MainWindowController extends Window with Initable {
     }
   }
 
-  private val addTransformationForMfRowAction = new Action {
-    override val description: String = "Add selected transformation"
-    override protected def onAction(): Unit = {
-      val selectedTransfName = possibleMfTransforms.getSelectionModel.getSelectedItem
-      model.possibleTransformations.toList.find(_.name == selectedTransfName).foreach(
-        model.selectedMainframeRow.get().appliedTransformations.add(_)
-      )
-    }
-  }
-
-  private val removeTransformationForMfRowAction = new Action {
-    override val description: String = "Remove selected transformation"
-    override protected def onAction(): Unit = {
-      val selectedTransfName = selectedMfTransforms.getSelectionModel.getSelectedItem
-      model.possibleTransformations.toList.find(_.name == selectedTransfName).foreach(
-        model.selectedMainframeRow.get().appliedTransformations.remove(_)
-      )
-    }
-  }
-
   private val disconnectAction = new Action {
     override val description: String = "Disconnect"
     enabled <== Expr(model.selectedMainframeRow, model.selectedJavaRow, model.connections){
@@ -128,8 +104,6 @@ class MainWindowController extends Window with Initable {
     loadAction
     ,connectAction
     ,disconnectAction
-    ,addTransformationForMfRowAction
-    ,removeTransformationForMfRowAction
   )
 
   override def init(): Unit = {
@@ -153,10 +127,7 @@ class MainWindowController extends Window with Initable {
     require(javaTimestampLabel != null)
     require(initialJavaLabel != null)
     require(resultJavaLabel != null)
-    require(possibleMfTransforms != null)
-    require(addMfTransformBtn != null)
-    require(removeMfTransformBtn != null)
-    require(selectedMfTransforms != null)
+    require(mfSelector != null)
 
     initWindow(rootNode)
     bindModel()
@@ -164,12 +135,11 @@ class MainWindowController extends Window with Initable {
     Action.bind(loadAction, loadBtn)
     Action.bind(connectAction, connectBtn)
     Action.bind(disconnectAction, disconnectBtn)
-    Action.bind(addTransformationForMfRowAction, addMfTransformBtn)
-    Action.bind(removeTransformationForMfRowAction, removeMfTransformBtn)
     JfxUtils.bindActionsToSceneProp(rootNode.sceneProperty(), actions)
   }
 
   private def bindModel(): Unit = {
+    mfSelector.getChildren.add(mfSelectorController.rootPane)
     hboxInScrollPane.setBorder(JfxUtils.createBorder(Color.BLUE))
     hboxInScrollPane.prefWidthProperty() <== scrollPane.widthProperty()
 
@@ -210,7 +180,7 @@ class MainWindowController extends Window with Initable {
     }
     resultJavaLabel.visibleProperty() <== detailedJavaView.visibleProperty()
 
-    possibleMfTransforms.getItems <== (model.possibleTransformations, (t: Transformation) => t.name)
+    mfSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
   }
 
   private def createLineFromConnection(connection: Connection) = {
@@ -249,7 +219,11 @@ class MainWindowController extends Window with Initable {
         timestampLabel.setText(selected.timestamp.toString)
         initialValueLabel.setText(selected.xmlStr)
         resultValueLabel.textProperty() <== selected.transformedXml
-        selectedMfTransforms.getItems() <== (selected.appliedTransformations, (t: Transformation) => t.name)
+        mfSelectorController.target.clear()
+        mfSelectorController.target.addAll(selected.appliedTransformations.toList.map(_.name))
+        selected.appliedTransformations <== (mfSelectorController.target, (tn: String) => {
+          model.possibleTransformations.toList.find(_.name == tn).get
+        })
       }
     }
   }
