@@ -89,7 +89,7 @@
                                           <HBox prefHeight="78.0" prefWidth="262.0">
                                              <children>
                                                 <ListView fx:id="selectedMfTransforms" prefHeight="200.0" prefWidth="200.0" />
-                                                <Button fx:id="deleteMfTransformBtn" mnemonicParsing="false" text="-" />
+                                                <Button fx:id="removeMfTransformBtn" mnemonicParsing="false" text="-" />
                                              </children>
                                           </HBox>
                                        </children>

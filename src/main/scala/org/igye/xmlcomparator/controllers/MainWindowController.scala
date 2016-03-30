@@ -67,6 +67,12 @@ class MainWindowController extends Window with Initable {
   protected var resultJavaLabel: Label = _
   @FXML
   protected var possibleMfTransforms: ChoiceBox[String] = _
+  @FXML
+  protected var addMfTransformBtn: Button = _
+  @FXML
+  protected var removeMfTransformBtn: Button = _
+  @FXML
+  protected var selectedMfTransforms: ListView[String] = _
 
   private val loadAction = new Action {
     override val description: String = "Load"
@@ -87,6 +93,26 @@ class MainWindowController extends Window with Initable {
     }
   }
 
+  private val addTransformationForMfRowAction = new Action {
+    override val description: String = "Add selected transformation"
+    override protected def onAction(): Unit = {
+      val selectedTransfName = possibleMfTransforms.getSelectionModel.getSelectedItem
+      model.possibleTransformations.toList.find(_.name == selectedTransfName).foreach(
+        model.selectedMainframeRow.get().appliedTransformations.add(_)
+      )
+    }
+  }
+
+  private val removeTransformationForMfRowAction = new Action {
+    override val description: String = "Remove selected transformation"
+    override protected def onAction(): Unit = {
+      val selectedTransfName = selectedMfTransforms.getSelectionModel.getSelectedItem
+      model.possibleTransformations.toList.find(_.name == selectedTransfName).foreach(
+        model.selectedMainframeRow.get().appliedTransformations.remove(_)
+      )
+    }
+  }
+
   private val disconnectAction = new Action {
     override val description: String = "Disconnect"
     enabled <== Expr(model.selectedMainframeRow, model.selectedJavaRow, model.connections){
@@ -102,6 +128,8 @@ class MainWindowController extends Window with Initable {
     loadAction
     ,connectAction
     ,disconnectAction
+    ,addTransformationForMfRowAction
+    ,removeTransformationForMfRowAction
   )
 
   override def init(): Unit = {
@@ -126,6 +154,9 @@ class MainWindowController extends Window with Initable {
     require(initialJavaLabel != null)
     require(resultJavaLabel != null)
     require(possibleMfTransforms != null)
+    require(addMfTransformBtn != null)
+    require(removeMfTransformBtn != null)
+    require(selectedMfTransforms != null)
 
     initWindow(rootNode)
     bindModel()
@@ -133,6 +164,8 @@ class MainWindowController extends Window with Initable {
     Action.bind(loadAction, loadBtn)
     Action.bind(connectAction, connectBtn)
     Action.bind(disconnectAction, disconnectBtn)
+    Action.bind(addTransformationForMfRowAction, addMfTransformBtn)
+    Action.bind(removeTransformationForMfRowAction, removeMfTransformBtn)
     JfxUtils.bindActionsToSceneProp(rootNode.sceneProperty(), actions)
   }
 
@@ -215,7 +248,8 @@ class MainWindowController extends Window with Initable {
       if (selected != null) {
         timestampLabel.setText(selected.timestamp.toString)
         initialValueLabel.setText(selected.xmlStr)
-        resultValueLabel.setText(selected.xmlStr)
+        resultValueLabel.textProperty() <== selected.transformedXml
+        selectedMfTransforms.getItems() <== (selected.appliedTransformations, (t: Transformation) => t.name)
       }
     }
   }

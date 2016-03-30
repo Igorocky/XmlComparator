@@ -56,7 +56,8 @@ class MainModel {
           id = file.getName + ":" + (lineNum + 1),
           timestamp = LocalDateTime.parse(timeStr, DateTimeFormatter.ofPattern("yyyyMMddHHmmss")),
           source = source,
-          xmlStr = xmlStr
+          xmlStr = xmlStr,
+          mainModel = this
         )
     }.toList.sortWith((r1, r2) => r1.timestamp.isBefore(r2.timestamp))
   }
