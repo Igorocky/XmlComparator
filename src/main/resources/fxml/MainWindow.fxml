@@ -74,20 +74,48 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                               </FlowPane>
-                              <SplitPane fx:id="secondSplitPane" dividerPositions="0.5" layoutX="24.0" layoutY="110.0" orientation="VERTICAL" prefHeight="217.0" prefWidth="270.0" VBox.vgrow="ALWAYS">
-                                <items>
-                                    <ScrollPane prefViewportHeight="153.0" prefViewportWidth="260.0">
-                                       <content>
-                                          <VBox fx:id="mainframeDetailedViewVbox" />
-                                       </content>
-                                    </ScrollPane>
-                                    <ScrollPane prefViewportHeight="152.0" prefViewportWidth="260.0">
-                                       <content>
-                                          <VBox fx:id="javaDetailedViewVbox" />
-                                       </content>
-                                    </ScrollPane>
-                                </items>
-                              </SplitPane>
+                              <ScrollPane fx:id="detailedMfView" prefHeight="155.0" prefWidth="358.0">
+                                 <content>
+                                    <VBox prefHeight="150.0" prefWidth="262.0">
+                                       <children>
+                                          <Label fx:id="mfTimestampLabel" text="mfTimestampLabel" />
+                                          <Label fx:id="initialMfLabel" text="initialMfLabel" />
+                                          <HBox prefWidth="262.0">
+                                             <children>
+                                                <ChoiceBox fx:id="possibleMfTransforms" prefWidth="150.0" />
+                                                <Button fx:id="addMfTransformBtn" mnemonicParsing="false" text="+" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="78.0" prefWidth="262.0">
+                                             <children>
+                                                <ListView fx:id="selectedMfTransforms" prefHeight="200.0" prefWidth="200.0" />
+                                                <Button fx:id="deleteMfTransformBtn" mnemonicParsing="false" text="-" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
+                              <ScrollPane prefHeight="54.0" prefWidth="358.0">
+                                 <content>
+                                    <VBox>
+                                       <children>
+                                          <Label fx:id="resultMfLabel" prefHeight="21.0" text="resultMfLabel" />
+                                          <Label fx:id="resultJavaLabel" text="resultJavaLabel" />
+                                       </children>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
+                              <ScrollPane fx:id="detailedJavaView" prefHeight="143.0" prefWidth="358.0">
+                                 <content>
+                                    <VBox prefHeight="107.0" prefWidth="252.0">
+                                       <children>
+                                          <Label fx:id="javaTimestampLabel" text="javaTimestampLabel" />
+                                          <Label fx:id="initialJavaLabel" text="initialJavaLabel" />
+                                       </children>
+                                    </VBox>
+                                 </content>
+                              </ScrollPane>
                            </children>
                         </VBox>
                      </children>

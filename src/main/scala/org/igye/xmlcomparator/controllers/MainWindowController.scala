@@ -1,11 +1,10 @@
 package org.igye.xmlcomparator.controllers
 
 import javafx.fxml.FXML
-import javafx.scene.Node
 import javafx.scene.control._
 import javafx.scene.input.KeyCode._
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.{Pane, HBox, StackPane, VBox}
+import javafx.scene.layout.{HBox, Pane, StackPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 
@@ -14,7 +13,7 @@ import org.igye.jfxutils.Implicits.{listToListOperators, nodeToNodeOps, observab
 import org.igye.jfxutils.action.{Action, Shortcut}
 import org.igye.jfxutils.annotations.FxmlFile
 import org.igye.jfxutils.fxml.Initable
-import org.igye.jfxutils.properties.{Expr, ChgListener}
+import org.igye.jfxutils.properties.{ChgListener, Expr}
 import org.igye.jfxutils.{JfxUtils, Window}
 import org.igye.xmlcomparator.models.{Connection, FileRow, MainModel}
 
@@ -49,9 +48,21 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var disconnectBtn: Button = _
   @FXML
-  protected var mainframeDetailedViewVbox: VBox = _
+  protected var detailedMfView: ScrollPane = _
   @FXML
-  protected var javaDetailedViewVbox: VBox = _
+  protected var detailedJavaView: ScrollPane = _
+  @FXML
+  protected var mfTimestampLabel: Label = _
+  @FXML
+  protected var initialMfLabel: Label = _
+  @FXML
+  protected var resultMfLabel: Label = _
+  @FXML
+  protected var javaTimestampLabel: Label = _
+  @FXML
+  protected var initialJavaLabel: Label = _
+  @FXML
+  protected var resultJavaLabel: Label = _
 
   private val loadAction = new Action {
     override val description: String = "Load"
@@ -98,11 +109,17 @@ class MainWindowController extends Window with Initable {
     require(mainframeElemsVbox != null)
     require(javaElemsVbox != null)
     require(arrowsPane != null)
-    require(mainframeDetailedViewVbox != null)
-    require(javaDetailedViewVbox != null)
+    require(detailedMfView != null)
+    require(detailedJavaView != null)
     require(loadBtn != null)
     require(connectBtn != null)
     require(disconnectBtn != null)
+    require(mfTimestampLabel != null)
+    require(initialMfLabel != null)
+    require(resultMfLabel != null)
+    require(javaTimestampLabel != null)
+    require(initialJavaLabel != null)
+    require(resultJavaLabel != null)
 
     initWindow(rootNode)
     bindModel()
@@ -142,8 +159,17 @@ class MainWindowController extends Window with Initable {
     javaElemsVbox.getChildren <== (model.javaRows, createNodeFromFileRow(_: FileRow, model.selectedJavaRow.setValue(_)))
     arrowsPane.getChildren <==(model.connections, createLineFromConnection)
 
-    model.selectedMainframeRow ==> createSelectionListener(mainframeElemsVbox, mainframeDetailedViewVbox)
-    model.selectedJavaRow ==> createSelectionListener(javaElemsVbox, javaDetailedViewVbox)
+    model.selectedMainframeRow ==> createSelectionListener(mainframeElemsVbox, detailedMfView, mfTimestampLabel, initialMfLabel, resultMfLabel)
+    model.selectedJavaRow ==> createSelectionListener(javaElemsVbox, detailedJavaView, javaTimestampLabel, initialJavaLabel, resultJavaLabel)
+
+    detailedMfView.visibleProperty() <== Expr(model.selectedMainframeRow) {
+      model.selectedMainframeRow.get() != null
+    }
+    resultMfLabel.visibleProperty() <== detailedMfView.visibleProperty()
+    detailedJavaView.visibleProperty() <== Expr(model.selectedJavaRow) {
+      model.selectedJavaRow.get() != null
+    }
+    resultJavaLabel.visibleProperty() <== detailedJavaView.visibleProperty()
   }
 
   private def createLineFromConnection(connection: Connection) = {
@@ -164,7 +190,9 @@ class MainWindowController extends Window with Initable {
     res
   }
 
-  private def createSelectionListener(elemsVbox: VBox, detailedViewVbox: VBox) = {
+  private def createSelectionListener(elemsVbox: VBox, detailedView: ScrollPane,
+                                      timestampLabel: Label, initialValueLabel: Label,
+                                      resultValueLabel: Label) = {
     ChgListener[FileRow] {chg=>
       val selected = chg.newValue
       elemsVbox.getChildren.toList.map(_.asInstanceOf[HasAssignedRow with Selectable])
@@ -176,11 +204,11 @@ class MainWindowController extends Window with Initable {
           }
         }
       updateSelection2()
-      detailedViewVbox.getChildren.clear()
       if (selected != null) {
-        detailedViewVbox.getChildren.add(new Label(selected.xmlStr))
+        timestampLabel.setText(selected.timestamp.toString)
+        initialValueLabel.setText(selected.xmlStr)
+        resultValueLabel.setText(selected.xmlStr)
       }
-
     }
   }
 
