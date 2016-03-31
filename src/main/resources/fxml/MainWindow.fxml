@@ -97,7 +97,7 @@
                               </ScrollPane>
                               <ScrollPane prefHeight="54.0" prefWidth="358.0">
                                  <content>
-                                    <VBox>
+                                    <VBox fx:id="comparingVbox">
                                        <children>
                                           <Label fx:id="resultMfLabel" prefHeight="21.0" text="resultMfLabel" />
                                           <Label fx:id="resultJavaLabel" text="resultJavaLabel" />

@@ -2,7 +2,6 @@ package org.igye.xmlcomparator.controllers
 
 import javafx.fxml.FXML
 import javafx.scene.control._
-import javafx.scene.input.KeyCode._
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{HBox, Pane, StackPane, VBox}
 import javafx.scene.paint.Color
@@ -10,12 +9,12 @@ import javafx.scene.shape.Line
 
 import org.apache.logging.log4j.{LogManager, Logger}
 import org.igye.jfxutils.Implicits.{listToListOperators, nodeToNodeOps, observableValueToObservableValueOperators, propertyToPropertyOperators}
-import org.igye.jfxutils.action.{Action, Shortcut}
+import org.igye.jfxutils.action.Action
 import org.igye.jfxutils.annotations.FxmlFile
 import org.igye.jfxutils.fxml.{FxmlSupport, Initable}
 import org.igye.jfxutils.properties.{ChgListener, Expr}
 import org.igye.jfxutils.{JfxUtils, Window}
-import org.igye.xmlcomparator.models.{Transformation, Connection, FileRow, MainModel}
+import org.igye.xmlcomparator.models.{Connection, FileRow, MainModel, Transformation}
 
 import scala.collection.JavaConversions._
 
@@ -74,6 +73,8 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var javaSelector: HBox = _
   protected val javaSelectorController = FxmlSupport.load[SelectorController]
+  @FXML
+  protected var comparingVbox: VBox = _
 
   private val loadAction = new Action {
     override val description: String = "Load"
@@ -134,6 +135,7 @@ class MainWindowController extends Window with Initable {
     require(mfSelector != null)
     require(javaSelector != null)
     require(genTransVbox != null)
+    require(comparingVbox != null)
 
     initWindow(rootNode)
     bindModel()
@@ -151,8 +153,8 @@ class MainWindowController extends Window with Initable {
     hboxInScrollPane.setBorder(JfxUtils.createBorder(Color.BLUE))
     hboxInScrollPane.prefWidthProperty() <== scrollPane.widthProperty()
 
-    mainframeElemsVbox.setBorder(JfxUtils.createBorder(Color.RED))
-    javaElemsVbox.setBorder(JfxUtils.createBorder(Color.RED))
+    mainframeElemsVbox.setBorder(JfxUtils.createBorder(Color.GRAY))
+    javaElemsVbox.setBorder(JfxUtils.createBorder(Color.GRAY))
 
     arrowsPane.prefWidthProperty() <== Expr(
       mainframeElemsVbox.widthProperty(),
@@ -185,24 +187,38 @@ class MainWindowController extends Window with Initable {
     model.genTransformations <== (genTransSelectorController.target, (tn: String) => {
       model.possibleTransformations.toList.find(_.name == tn).get
     })
+
+    comparingVbox.backgroundProperty() <== Expr(resultMfLabel.textProperty(), resultJavaLabel.textProperty()) {
+      if (resultMfLabel.getText == resultJavaLabel.getText) {
+        JfxUtils.createBackground(Color.GREEN)
+      } else {
+        JfxUtils.createBackground(Color.RED)
+      }
+    }
   }
 
   private def createLineFromConnection(connection: Connection) = {
     val mfLabel = mainframeElemsVbox.getChildren.toList.find(_.asInstanceOf[HasAssignedRow].getRow == connection.mainframeRow).get
     val javaLabel = javaElemsVbox.getChildren.toList.find(_.asInstanceOf[HasAssignedRow].getRow == connection.javaRow).get
-    val res = new Line()
-    res.setStartX(0);
-    res.startYProperty <== Expr(mfLabel.layoutYProperty(), mfLabel.layoutBoundsProperty()) {
+    val line = new Line()
+    line.setStartX(0);
+    line.startYProperty <== Expr(mfLabel.layoutYProperty(), mfLabel.layoutBoundsProperty()) {
       mfLabel.getLayoutY() + mfLabel.getLayoutBounds.getHeight / 2
     }
-    res.endXProperty() <== Expr(arrowsPane.widthProperty()) {
+    line.endXProperty() <== Expr(arrowsPane.widthProperty()) {
       arrowsPane.getWidth()
     }
-    res.endYProperty() <== Expr(javaLabel.layoutYProperty(), javaLabel.layoutBoundsProperty()) {
+    line.endYProperty() <== Expr(javaLabel.layoutYProperty(), javaLabel.layoutBoundsProperty()) {
       javaLabel.getLayoutY() + javaLabel.getLayoutBounds.getHeight / 2
     }
-    res.setStroke(Color.RED)
-    res
+    line.strokeProperty <== Expr(connection.mainframeRow.transformedXml, connection.javaRow.transformedXml) {
+      if (connection.mainframeRow.transformedXml.getValue == connection.javaRow.transformedXml.getValue) {
+        Color.GREEN
+      } else {
+        Color.RED
+      }
+    }
+    line
   }
 
   private def createSelectionListener(elemsVbox: VBox, detailedView: ScrollPane,
