@@ -71,6 +71,9 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var mfSelector: HBox = _
   protected val mfSelectorController = FxmlSupport.load[SelectorController]
+  @FXML
+  protected var javaSelector: HBox = _
+  protected val javaSelectorController = FxmlSupport.load[SelectorController]
 
   private val loadAction = new Action {
     override val description: String = "Load"
@@ -130,6 +133,7 @@ class MainWindowController extends Window with Initable {
     require(initialJavaLabel != null)
     require(resultJavaLabel != null)
     require(mfSelector != null)
+    require(javaSelector != null)
     require(genTransVbox != null)
 
     initWindow(rootNode)
@@ -143,6 +147,7 @@ class MainWindowController extends Window with Initable {
 
   private def bindModel(): Unit = {
     mfSelector.getChildren.add(mfSelectorController.rootPane)
+    javaSelector.getChildren.add(javaSelectorController.rootPane)
     genTransVbox.getChildren.add(genTransSelectorController.rootPane)
     hboxInScrollPane.setBorder(JfxUtils.createBorder(Color.BLUE))
     hboxInScrollPane.prefWidthProperty() <== scrollPane.widthProperty()
@@ -162,8 +167,8 @@ class MainWindowController extends Window with Initable {
     javaElemsVbox.getChildren <== (model.javaRows, createNodeFromFileRow(_: FileRow, model.selectedJavaRow.setValue(_)))
     arrowsPane.getChildren <==(model.connections, createLineFromConnection)
 
-    model.selectedMainframeRow ==> createSelectionListener(mainframeElemsVbox, detailedMfView, mfTimestampLabel, initialMfLabel, resultMfLabel)
-    model.selectedJavaRow ==> createSelectionListener(javaElemsVbox, detailedJavaView, javaTimestampLabel, initialJavaLabel, resultJavaLabel)
+    model.selectedMainframeRow ==> createSelectionListener(mainframeElemsVbox, detailedMfView, mfTimestampLabel, initialMfLabel, resultMfLabel, mfSelectorController)
+    model.selectedJavaRow ==> createSelectionListener(javaElemsVbox, detailedJavaView, javaTimestampLabel, initialJavaLabel, resultJavaLabel, javaSelectorController)
 
     detailedMfView.visibleProperty() <== Expr(model.selectedMainframeRow) {
       model.selectedMainframeRow.get() != null
@@ -175,6 +180,7 @@ class MainWindowController extends Window with Initable {
     resultJavaLabel.visibleProperty() <== detailedJavaView.visibleProperty()
 
     mfSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
+    javaSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
     genTransSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
     genTransSelectorController.target.addAll(model.genTransformations.toList.map(_.name))
     model.genTransformations <== (genTransSelectorController.target, (tn: String) => {
@@ -202,7 +208,7 @@ class MainWindowController extends Window with Initable {
 
   private def createSelectionListener(elemsVbox: VBox, detailedView: ScrollPane,
                                       timestampLabel: Label, initialValueLabel: Label,
-                                      resultValueLabel: Label) = {
+                                      resultValueLabel: Label, selectorController: SelectorController) = {
     ChgListener[FileRow] {chg=>
       val selected = chg.newValue
       elemsVbox.getChildren.toList.map(_.asInstanceOf[HasAssignedRow with Selectable])
@@ -218,9 +224,9 @@ class MainWindowController extends Window with Initable {
         timestampLabel.setText(selected.timestamp.toString)
         initialValueLabel.setText(selected.xmlStr)
         resultValueLabel.textProperty() <== selected.transformedXml
-        mfSelectorController.target.clear()
-        mfSelectorController.target.addAll(selected.appliedTransformations.toList.map(_.name))
-        selected.appliedTransformations <== (mfSelectorController.target, (tn: String) => {
+        selectorController.target.clear()
+        selectorController.target.addAll(selected.appliedTransformations.toList.map(_.name))
+        selected.appliedTransformations <== (selectorController.target, (tn: String) => {
           model.possibleTransformations.toList.find(_.name == tn).get
         })
       }
