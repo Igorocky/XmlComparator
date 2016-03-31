@@ -66,8 +66,10 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var resultJavaLabel: Label = _
   @FXML
+  protected var genTransVbox: VBox = _
+  protected val genTransSelectorController = FxmlSupport.load[SelectorController]
+  @FXML
   protected var mfSelector: HBox = _
-
   protected val mfSelectorController = FxmlSupport.load[SelectorController]
 
   private val loadAction = new Action {
@@ -128,6 +130,7 @@ class MainWindowController extends Window with Initable {
     require(initialJavaLabel != null)
     require(resultJavaLabel != null)
     require(mfSelector != null)
+    require(genTransVbox != null)
 
     initWindow(rootNode)
     bindModel()
@@ -140,20 +143,11 @@ class MainWindowController extends Window with Initable {
 
   private def bindModel(): Unit = {
     mfSelector.getChildren.add(mfSelectorController.rootPane)
+    genTransVbox.getChildren.add(genTransSelectorController.rootPane)
     hboxInScrollPane.setBorder(JfxUtils.createBorder(Color.BLUE))
     hboxInScrollPane.prefWidthProperty() <== scrollPane.widthProperty()
 
     mainframeElemsVbox.setBorder(JfxUtils.createBorder(Color.RED))
-//    mainframeElemsVbox.prefWidthProperty() <== Expr(mainframeElemsVbox.getChildren) {
-//      if (mainframeElemsVbox.getChildren.isEmpty) {
-//        100
-//      } else {
-//        mainframeElemsVbox.getChildren.toList.map(_.asInstanceOf[Label].getBoundsInLocal.getMaxX).max
-//      }
-//    }
-//    mainframeElemsVbox.minWidthProperty() <== mainframeElemsVbox.prefWidthProperty()
-//    mainframeElemsVbox.maxWidthProperty() <== mainframeElemsVbox.prefWidthProperty()
-
     javaElemsVbox.setBorder(JfxUtils.createBorder(Color.RED))
 
     arrowsPane.prefWidthProperty() <== Expr(
@@ -181,6 +175,11 @@ class MainWindowController extends Window with Initable {
     resultJavaLabel.visibleProperty() <== detailedJavaView.visibleProperty()
 
     mfSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
+    genTransSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
+    genTransSelectorController.target.addAll(model.genTransformations.toList.map(_.name))
+    model.genTransformations <== (genTransSelectorController.target, (tn: String) => {
+      model.possibleTransformations.toList.find(_.name == tn).get
+    })
   }
 
   private def createLineFromConnection(connection: Connection) = {

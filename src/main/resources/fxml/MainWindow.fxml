@@ -8,37 +8,49 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="rootNode" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="724.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.igye.xmlcomparator.controllers.MainWindowController">
+<StackPane fx:id="rootNode" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1001.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.igye.xmlcomparator.controllers.MainWindowController">
    <children>
       <VBox prefHeight="453.0" prefWidth="701.0">
          <children>
-            <GridPane>
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+            <HBox>
                <children>
-                  <Label text="mainframe" />
-                  <Label text="java" GridPane.rowIndex="1" />
-                  <TextField fx:id="mainframeFld" text="D:\programs\scala\XmlComparator\src\test\resources\mainframeFile.txt" GridPane.columnIndex="1" />
-                  <TextField fx:id="javaFld" text="D:\programs\scala\XmlComparator\src\test\resources\javaFile.txt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="Jar" GridPane.rowIndex="2" />
-                  <TextField fx:id="jarFld" text="D:\programs\java\comparex\target\comparex-1.0-SNAPSHOT.jar" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Button fx:id="leftFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" />
-                  <Button fx:id="rightFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                  <Button fx:id="jarBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                  <Label text="Result" GridPane.rowIndex="3" />
-                  <TextField fx:id="resultFld" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Button fx:id="resultBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <GridPane>
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="mainframe" />
+                        <Label text="java" GridPane.columnIndex="3" />
+                        <TextField fx:id="mainframeFld" text="D:\programs\scala\XmlComparator\src\test\resources\mainframeFile.txt" GridPane.columnIndex="1" />
+                        <TextField fx:id="javaFld" text="D:\programs\scala\XmlComparator\src\test\resources\javaFile.txt" GridPane.columnIndex="4" />
+                        <Label text="Jar" GridPane.rowIndex="1" />
+                        <TextField fx:id="jarFld" text="D:\programs\java\comparex\target\comparex-1.0-SNAPSHOT.jar" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Button fx:id="leftFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" />
+                        <Button fx:id="rightFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="5" />
+                        <Button fx:id="jarBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label text="Result" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <TextField fx:id="resultFld" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <Button fx:id="resultBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
+                  <VBox fx:id="genTransVbox" prefHeight="200.0" prefWidth="320.0">
+                     <children>
+                        <Label text="General transformations:" />
+                     </children>
+                  </VBox>
                </children>
-            </GridPane>
+            </HBox>
             <FlowPane hgap="5.0" prefHeight="40.0" prefWidth="724.0">
                <children>
                   <Button fx:id="loadBtn" mnemonicParsing="false" text="Load" />
@@ -74,7 +86,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                               </FlowPane>
-                              <ScrollPane fx:id="detailedMfView" prefHeight="155.0" prefWidth="358.0">
+                              <ScrollPane fx:id="detailedMfView" prefHeight="161.0" prefWidth="358.0">
                                  <content>
                                     <VBox prefHeight="150.0" prefWidth="262.0">
                                        <children>

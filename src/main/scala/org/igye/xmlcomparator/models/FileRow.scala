@@ -18,8 +18,8 @@ case class FileRow(id: String, timestamp: LocalDateTime, source: String, xmlStr:
 
   val transformedXml: SimpleStringProperty = new SimpleStringProperty("")
 
-  transformedXml <== Expr(appliedTransformations){
-    appliedTransformations.toList.foldLeft(xmlStr){(result, transformation) =>
+  transformedXml <== Expr(mainModel.genTransformations, appliedTransformations){
+    (mainModel.genTransformations.toList:::appliedTransformations.toList).foldLeft(xmlStr){(result, transformation) =>
       transformation.inst.getClass.getMethod("modify", classOf[String]).invoke(transformation.inst, result).asInstanceOf[String]
     }
   }

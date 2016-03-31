@@ -19,6 +19,7 @@ class MainModel {
   val javaRows = FXCollections.observableArrayList[FileRow]()
   val connections = FXCollections.observableArrayList[Connection]()
   val possibleTransformations = FXCollections.observableArrayList[Transformation]()
+  val genTransformations = FXCollections.observableArrayList[Transformation]()
 
   val selectedMainframeRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
   val selectedJavaRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
