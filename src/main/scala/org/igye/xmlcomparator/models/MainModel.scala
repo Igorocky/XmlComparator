@@ -41,6 +41,8 @@ class MainModel {
   }
 
   def load(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
+    selectedMainframeRow.setValue(null)
+    selectedJavaRow.setValue(null)
     mainframeRows.clear()
     javaRows.clear()
 

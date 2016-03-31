@@ -1,20 +1,19 @@
 package org.igye.xmlcomparator.models
 
 import java.time.LocalDateTime
-import javafx.beans.property.{SimpleStringProperty, SimpleObjectProperty, ObjectProperty}
-import javafx.collections.FXCollections
+import javafx.beans.property.SimpleStringProperty
 
 import org.igye.jfxutils.Implicits.propertyToPropertyOperators
-import org.igye.jfxutils.properties.Expr
+import org.igye.jfxutils.properties.{Expr, SyncronizableList}
 
-import scala.xml.{Elem, XML}
 import scala.collection.JavaConversions._
+import scala.xml.{Elem, XML}
 
 case class FileRow(id: String, timestamp: LocalDateTime, source: String, xmlStr: String, mainModel: MainModel) {
   val xml: Elem = XML.loadString(xmlStr)
   val accId = extractAccId(xml)
 
-  val appliedTransformations = FXCollections.observableArrayList[Transformation]()
+  val appliedTransformations = new SyncronizableList[Transformation]
 
   val transformedXml: SimpleStringProperty = new SimpleStringProperty("")
 

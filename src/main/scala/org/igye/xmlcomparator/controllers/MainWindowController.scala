@@ -77,7 +77,6 @@ class MainWindowController extends Window with Initable {
 
   private val loadAction = new Action {
     override val description: String = "Load"
-    setShortcut(Shortcut(CONTROL, L))
     override protected def onAction(): Unit = {
       model.load(mainframeFld.getText, javaFld.getText, jarFld.getText, null)
     }
@@ -210,6 +209,9 @@ class MainWindowController extends Window with Initable {
                                       timestampLabel: Label, initialValueLabel: Label,
                                       resultValueLabel: Label, selectorController: SelectorController) = {
     ChgListener[FileRow] {chg=>
+      if (chg.oldValue != null) {
+        chg.oldValue.appliedTransformations.unbind()
+      }
       val selected = chg.newValue
       elemsVbox.getChildren.toList.map(_.asInstanceOf[HasAssignedRow with Selectable])
         .foreach{label =>
