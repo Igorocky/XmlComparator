@@ -164,8 +164,22 @@ class MainWindowController extends Window with Initable {
       hboxInScrollPane.getWidth() - mainframeElemsVbox.getWidth() - javaElemsVbox.getWidth()
     }
 
-    mainframeElemsVbox.getChildren <== (model.mainframeRows, createNodeFromFileRow(_: FileRow, model.selectedMainframeRow.setValue(_)))
-    javaElemsVbox.getChildren <== (model.javaRows, createNodeFromFileRow(_: FileRow, model.selectedJavaRow.setValue(_)))
+    mainframeElemsVbox.getChildren <== (model.mainframeRows, createNodeFromFileRow(
+      _: FileRow,
+      model.selectedMainframeRow.setValue(_),
+      selectedMfRow => {
+        model.selectedMainframeRow.setValue(selectedMfRow)
+        model.connections.find(_.mainframeRow == selectedMfRow).foreach(con => model.selectedJavaRow.setValue(con.javaRow))
+      }
+    ))
+    javaElemsVbox.getChildren <== (model.javaRows, createNodeFromFileRow(
+      _: FileRow,
+      model.selectedJavaRow.setValue(_),
+      selectedJavaRow => {
+        model.selectedJavaRow.setValue(selectedJavaRow)
+        model.connections.find(_.javaRow == selectedJavaRow).foreach(con => model.selectedMainframeRow.setValue(con.mainframeRow))
+      }
+    ))
     arrowsPane.getChildren <==(model.connections, createLineFromConnection)
 
     model.selectedMainframeRow ==> createSelectionListener(mainframeElemsVbox, detailedMfView, mfTimestampLabel, initialMfLabel, resultMfLabel, mfSelectorController)
@@ -266,7 +280,7 @@ class MainWindowController extends Window with Initable {
     }
   }
 
-  private def createNodeFromFileRow(fileRow: FileRow, mouseClickedHnd: FileRow => Unit) = {
+  private def createNodeFromFileRow(fileRow: FileRow, mouseClickedHnd: FileRow => Unit, mouseDblClickedHnd: FileRow => Unit) = {
     val res = new Label(fileRow.id) with HasAssignedRow with Selectable {
       private val initialBackground = getBackground
 
@@ -278,7 +292,11 @@ class MainWindowController extends Window with Initable {
       override def unselect: Unit = setBackground(initialBackground)
     }
     res.hnd(MouseEvent.MOUSE_CLICKED){ event =>
-      mouseClickedHnd(fileRow)
+      if (event.getClickCount == 1) {
+        mouseClickedHnd(fileRow)
+      } else if (event.getClickCount == 2) {
+        mouseDblClickedHnd(fileRow)
+      }
     }
     res
   }
