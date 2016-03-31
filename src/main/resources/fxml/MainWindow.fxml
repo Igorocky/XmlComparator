@@ -38,7 +38,7 @@
                         <Button fx:id="rightFileBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="5" />
                         <Button fx:id="jarBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <Label text="Result" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <TextField fx:id="resultFld" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <TextField fx:id="resultFld" text="D:\temp\xmlCoparator\report.xml" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                         <Button fx:id="resultBtn" mnemonicParsing="false" text="..." GridPane.columnIndex="5" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
@@ -52,6 +52,7 @@
             <FlowPane hgap="5.0" prefHeight="40.0" prefWidth="724.0">
                <children>
                   <Button fx:id="loadBtn" mnemonicParsing="false" text="Load" />
+                  <HBox prefHeight="25.0" prefWidth="452.0" />
                   <Button fx:id="saveBtn" mnemonicParsing="false" text="Save" />
                </children>
                <padding>

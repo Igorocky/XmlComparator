@@ -33,6 +33,8 @@ class MainWindowController extends Window with Initable {
   @FXML
   protected var jarFld: TextField = _
   @FXML
+  protected var resultFld: TextField = _
+  @FXML
   protected var scrollPane: ScrollPane = _
   @FXML
   protected var hboxInScrollPane: HBox = _
@@ -44,6 +46,8 @@ class MainWindowController extends Window with Initable {
   protected var arrowsPane: Pane = _
   @FXML
   protected var loadBtn: Button = _
+  @FXML
+  protected var saveBtn: Button = _
   @FXML
   protected var connectBtn: Button = _
   @FXML
@@ -83,6 +87,13 @@ class MainWindowController extends Window with Initable {
     }
   }
 
+  private val saveAction = new Action {
+    override val description: String = "Save"
+    override protected def onAction(): Unit = {
+      model.save(mainframeFld.getText, javaFld.getText, jarFld.getText, resultFld.getText)
+    }
+  }
+
   private val connectAction = new Action {
     override val description: String = "Connect"
     enabled <== Expr(model.selectedMainframeRow, model.selectedJavaRow, model.connections){
@@ -107,6 +118,7 @@ class MainWindowController extends Window with Initable {
 
   private val actions = List(
     loadAction
+    ,saveAction
     ,connectAction
     ,disconnectAction
   )
@@ -116,6 +128,7 @@ class MainWindowController extends Window with Initable {
     require(mainframeFld != null)
     require(javaFld != null)
     require(jarFld != null)
+    require(resultFld != null)
     require(scrollPane != null)
     require(hboxInScrollPane != null)
     require(mainframeElemsVbox != null)
@@ -124,6 +137,7 @@ class MainWindowController extends Window with Initable {
     require(detailedMfView != null)
     require(detailedJavaView != null)
     require(loadBtn != null)
+    require(saveBtn != null)
     require(connectBtn != null)
     require(disconnectBtn != null)
     require(mfTimestampLabel != null)
@@ -141,6 +155,7 @@ class MainWindowController extends Window with Initable {
     bindModel()
 
     Action.bind(loadAction, loadBtn)
+    Action.bind(saveAction, saveBtn)
     Action.bind(connectAction, connectBtn)
     Action.bind(disconnectAction, disconnectBtn)
     JfxUtils.bindActionsToSceneProp(rootNode.sceneProperty(), actions)

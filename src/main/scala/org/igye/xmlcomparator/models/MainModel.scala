@@ -2,11 +2,13 @@ package org.igye.xmlcomparator.models
 
 import java.io.File
 import java.net.{URL, URLClassLoader}
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZonedDateTime}
 import javafx.beans.property.{ObjectProperty, SimpleObjectProperty}
 import javafx.collections.FXCollections
 
+import org.igye.commonutils.JaxbSupport
+import org.igye.xmlcomparator.report.{ConnectionPojo, PerRowModifiers, ReportPojo}
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner}
 import org.reflections.util.{ClasspathHelper, ConfigurationBuilder, FilterBuilder}
@@ -82,10 +84,34 @@ class MainModel {
     reflections.getAllTypes().toList.map{className=>
       Transformation(className.split('.').last, Class.forName(className, true, child).newInstance())
     }
+  }
 
-//    Class classToLoad = Class.forName ("com.MyClass", true, child);
-//    Method method = classToLoad.getDeclaredMethod ("myMethod");
-//    Object instance = classToLoad.newInstance ();
-//    Object result = method.invoke (instance);
+  def save(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
+    JaxbSupport.marshal(createReport(mainframeFile, javaFile, jarFile), new File(resultFile))
+  }
+
+  private def createReport(mainframeFile: String, javaFile: String, jarFile: String): ReportPojo = {
+    val res = new ReportPojo
+
+    res.lastModifiedOn = ZonedDateTime.now().toString
+    res.mainframeFile = mainframeFile
+    res.javaFile = javaFile
+    res.jarFile = jarFile
+
+    genTransformations.foreach(tr => res.generalModifiers.add(tr.name))
+
+    (mainframeRows.toList:::javaRows.toList).filter(_.appliedTransformations.size() > 0).foreach{fileRow=>
+      val perRowModifiers = new PerRowModifiers
+      res.rowModifiersList.add(perRowModifiers)
+      perRowModifiers.lineId = fileRow.id
+      fileRow.appliedTransformations.toList.foreach(tr => perRowModifiers.modifiers.add(tr.name))
+    }
+    connections.toList.foreach{con=>
+      val conPojo = new ConnectionPojo
+      conPojo.mainframeId = con.mainframeRow.id
+      conPojo.javaId = con.javaRow.id
+      res.connections.add(conPojo)
+    }
+    res
   }
 }
