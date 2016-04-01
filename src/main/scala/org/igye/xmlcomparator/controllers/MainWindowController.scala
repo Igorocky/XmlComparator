@@ -83,14 +83,22 @@ class MainWindowController extends Window with Initable {
   private val loadAction = new Action {
     override val description: String = "Load"
     override protected def onAction(): Unit = {
-      model.load(mainframeFld.getText, javaFld.getText, jarFld.getText, null)
+      model.genTransformations.unbind()
+      genTransSelectorController.target.clear()
+
+      model.load(mainframeFld, javaFld, jarFld, resultFld.getText)
+
+      genTransSelectorController.target.addAll(model.genTransformations.toList.map(_.name))
+      model.genTransformations <== (genTransSelectorController.target, (tn: String) => {
+        model.possibleTransformations.toList.find(_.name == tn).get
+      })
     }
   }
 
   private val saveAction = new Action {
     override val description: String = "Save"
     override protected def onAction(): Unit = {
-      model.save(mainframeFld.getText, javaFld.getText, jarFld.getText, resultFld.getText)
+      model.save(mainframeFld, javaFld, jarFld, resultFld.getText)
     }
   }
 
@@ -212,10 +220,6 @@ class MainWindowController extends Window with Initable {
     mfSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
     javaSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
     genTransSelectorController.source <== (model.possibleTransformations, (t: Transformation) => t.name)
-    genTransSelectorController.target.addAll(model.genTransformations.toList.map(_.name))
-    model.genTransformations <== (genTransSelectorController.target, (tn: String) => {
-      model.possibleTransformations.toList.find(_.name == tn).get
-    })
 
     comparingVbox.backgroundProperty() <== Expr(resultMfLabel.textProperty(), resultJavaLabel.textProperty()) {
       if (resultMfLabel.getText == resultJavaLabel.getText) {

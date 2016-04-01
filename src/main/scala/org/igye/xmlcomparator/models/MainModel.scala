@@ -6,8 +6,10 @@ import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZonedDateTime}
 import javafx.beans.property.{ObjectProperty, SimpleObjectProperty}
 import javafx.collections.FXCollections
+import javafx.scene.control.TextField
 
 import org.igye.commonutils.JaxbSupport
+import org.igye.jfxutils.properties.SyncronizableList
 import org.igye.xmlcomparator.report.{ConnectionPojo, PerRowModifiers, ReportPojo}
 import org.reflections.Reflections
 import org.reflections.scanners.{ResourcesScanner, SubTypesScanner}
@@ -21,10 +23,12 @@ class MainModel {
   val javaRows = FXCollections.observableArrayList[FileRow]()
   val connections = FXCollections.observableArrayList[Connection]()
   val possibleTransformations = FXCollections.observableArrayList[Transformation]()
-  val genTransformations = FXCollections.observableArrayList[Transformation]()
+  val genTransformations = new SyncronizableList[Transformation]
 
   val selectedMainframeRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
   val selectedJavaRow: ObjectProperty[FileRow] = new SimpleObjectProperty(null)
+
+  var report: ReportPojo = _
 
   def connect(mainframeRow: FileRow, javaRow: FileRow): Unit = {
     connections.add(Connection(mainframeRow, javaRow))
@@ -42,17 +46,62 @@ class MainModel {
     connections.toList.find(c => c.mainframeRow == mainframeRow && c.javaRow == javaRow).isDefined
   }
 
-  def load(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
+  def load(mainframeFile: TextField, javaFile: TextField, jarFile: TextField, resultFile: String): Unit = {
     selectedMainframeRow.setValue(null)
     selectedJavaRow.setValue(null)
     mainframeRows.clear()
     javaRows.clear()
-
     possibleTransformations.clear()
-    readModifiers(jarFile).foreach(possibleTransformations.add(_))
+    genTransformations.clear()
+    connections.clear()
 
-    loadFromFile(new File(mainframeFile)).foreach{mainframeRows.add}
-    loadFromFile(new File(javaFile)).foreach{javaRows.add}
+    if (resultFile.trim != "") {
+      report = readReport(resultFile)
+      mainframeFile.setText(report.mainframeFile)
+      javaFile.setText(report.javaFile)
+      jarFile.setText(report.jarFile)
+    }
+
+    readModifiers(jarFile.getText).foreach(possibleTransformations.add(_))
+
+    loadFromFile(new File(mainframeFile.getText)).foreach{mainframeRows.add}
+    loadFromFile(new File(javaFile.getText)).foreach{javaRows.add}
+
+    if (report != null) {
+      mainframeFile.setText("")
+      javaFile.setText("")
+      jarFile.setText("")
+
+      report.generalModifiers.foreach{gmName =>
+        genTransformations.add(
+          possibleTransformations.find(_.name == gmName).getOrElse(
+            throw new Exception(s"Can't find modifier with name $gmName")
+          )
+        )
+      }
+
+      val allRows = (mainframeRows.toList:::javaRows.toList)
+      def findRow(id: String) = {
+        allRows.find(_.id == id).getOrElse(
+          throw new Exception(s"Can't find row with id ${id}")
+        )
+      }
+
+      report.rowModifiersList.foreach{perRowModifs=>
+        val row = findRow(perRowModifs.lineId)
+        perRowModifs.modifiers.foreach{trName=>
+          row.appliedTransformations.add(
+            possibleTransformations.find(_.name == trName).getOrElse(
+              throw new Exception(s"Can't find modifier with name $trName")
+            )
+          )
+        }
+      }
+
+      report.connections.foreach{con=>
+        connections.add(Connection(findRow(con.mainframeId), findRow(con.javaId)))
+      }
+    }
   }
 
   private def loadFromFile(file: File) = {
@@ -86,17 +135,21 @@ class MainModel {
     }
   }
 
-  def save(mainframeFile: String, javaFile: String, jarFile: String, resultFile: String): Unit = {
-    JaxbSupport.marshal(createReport(mainframeFile, javaFile, jarFile), new File(resultFile))
+  def save(mainframeFile: TextField, javaFile: TextField, jarFile: TextField, resultFile: String): Unit = {
+    report = createReport(mainframeFile.getText, javaFile.getText, jarFile.getText)
+    JaxbSupport.marshal(report, new File(resultFile))
+    mainframeFile.setText("")
+    javaFile.setText("")
+    jarFile.setText("")
   }
 
   private def createReport(mainframeFile: String, javaFile: String, jarFile: String): ReportPojo = {
     val res = new ReportPojo
 
     res.lastModifiedOn = ZonedDateTime.now().toString
-    res.mainframeFile = mainframeFile
-    res.javaFile = javaFile
-    res.jarFile = jarFile
+    res.mainframeFile = if (report != null) report.mainframeFile else mainframeFile
+    res.javaFile = if (report != null) report.javaFile else javaFile
+    res.jarFile = if (report != null) report.jarFile else jarFile
 
     genTransformations.foreach(tr => res.generalModifiers.add(tr.name))
 
@@ -113,5 +166,9 @@ class MainModel {
       res.connections.add(conPojo)
     }
     res
+  }
+
+  private def readReport(fileStr: String): ReportPojo = {
+    JaxbSupport.unmarshal[ReportPojo](new File(fileStr))
   }
 }
