@@ -1,5 +1,7 @@
 package org.igye.xmlcomparator.controllers
 
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import javafx.fxml.FXML
 import javafx.scene.control._
 import javafx.scene.input.MouseEvent
@@ -79,6 +81,8 @@ class MainWindowController extends Window with Initable {
   protected val javaSelectorController = FxmlSupport.load[SelectorController]
   @FXML
   protected var comparingVbox: VBox = _
+  @FXML
+  protected var comparingScrollPane: ScrollPane = _
 
   private val loadAction = new Action {
     override val description: String = "Load"
@@ -158,6 +162,7 @@ class MainWindowController extends Window with Initable {
     require(javaSelector != null)
     require(genTransVbox != null)
     require(comparingVbox != null)
+    require(comparingScrollPane != null)
 
     initWindow(rootNode)
     bindModel()
@@ -228,6 +233,24 @@ class MainWindowController extends Window with Initable {
         JfxUtils.createBackground(Color.RED)
       }
     }
+
+    comparingScrollPane.hnd(MouseEvent.MOUSE_CLICKED){event=>
+      if (event.getClickCount == 2 && (model.selectedMainframeRow.get != null || model.selectedJavaRow.get != null)) {
+        val mfText = if (model.selectedMainframeRow.get != null) {
+          model.selectedMainframeRow.get.id + " " + model.selectedMainframeRow.get.transformedXml.get()
+        } else {
+          ""
+        }
+        val javaText = if (model.selectedJavaRow.get != null) {
+          model.selectedJavaRow.get.id + " " + model.selectedJavaRow.get.transformedXml.get()
+        } else {
+          ""
+        }
+        val selection = new StringSelection(mfText + "\n" + javaText)
+        val clipboard = Toolkit.getDefaultToolkit().getSystemClipboard()
+        clipboard.setContents(selection, selection)
+      }
+    }
   }
 
   private def createLineFromConnection(connection: Connection) = {
@@ -272,7 +295,7 @@ class MainWindowController extends Window with Initable {
         }
       updateSelection2()
       if (selected != null) {
-        timestampLabel.setText(selected.timestamp.toString)
+        timestampLabel.setText(selected.id + " " + selected.timestamp.toString)
         initialValueLabel.setText(selected.xmlStr)
         resultValueLabel.textProperty() <== selected.transformedXml
         selectorController.target.clear()

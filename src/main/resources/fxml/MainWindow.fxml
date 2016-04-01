@@ -96,7 +96,7 @@
                                     </VBox>
                                  </content>
                               </ScrollPane>
-                              <ScrollPane prefHeight="54.0" prefWidth="358.0">
+                              <ScrollPane fx:id="comparingScrollPane" prefHeight="54.0" prefWidth="358.0">
                                  <content>
                                     <VBox fx:id="comparingVbox">
                                        <children>
